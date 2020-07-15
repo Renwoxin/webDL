@@ -5,7 +5,7 @@ import sys
 import numpy as np
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import TfidfTransformer,TfidfVectorizer
 from sklearn.neural_network import MLPClassifier
 from sklearn import svm
 from sklearn.model_selection import train_test_split
@@ -288,12 +288,14 @@ def check_webshell(clf,dir):
     webshell=0
 
     webshell_files_list = load_files_re(webshell_dir)
-    CV = CountVectorizer(ngram_range=(3, 3), decode_error="ignore", max_features=max_features,
-                         token_pattern=r'\b\w+\b', min_df=1, max_df=1.0)
-    x = CV.fit_transform(webshell_files_list).toarray()
 
-    transformer = TfidfTransformer(smooth_idf=False)
-    transformer.fit_transform(x)
+    transformer = TfidfVectorizer(ngram_range=(3, 3),
+                                 token_pattern=r'\b\d+\b',
+                                 strip_accents='ascii',
+                                 max_features=max_features,
+                                 stop_words='english',
+                                 max_df=1.0,
+                                 min_df=1)
 
 
     g = os.walk(dir)
@@ -303,8 +305,7 @@ def check_webshell(clf,dir):
             t = load_file(fulepath)
             t_list=[]
             t_list.append(t)
-            x2 = CV.transform(t_list).toarray()
-            x2 = transformer.transform(x2).toarray()
+            x2 = transformer.transform(t).toarray()
             y_pred = clf.predict(x2)
             all+=1
             if filename.endswith('.php'):
@@ -486,20 +487,20 @@ if __name__ == '__main__':
 
 
 
-    # print ("xgboost and bag and 2-gram")
-    # max_features=5000
-    # print ("max_features=%d" % max_features)
-    # x, y = get_feature_by_bag_tfidf()
-    # print ("load %d white %d black" % (white_count, black_count))
-    # do_xgboost(x, y)
-
-    print ("xgboost and opcode and 4-gram")
-    max_features=10000
-    max_document_length=4000
-    print ("max_features=%d max_document_length=%d" % (max_features,max_document_length))
-    x, y = get_feature_by_opcode()
+    print ("xgboost and bag and 2-gram")
+    max_features=5000
+    print ("max_features=%d" % max_features)
+    x, y = get_feature_by_bag_tfidf()
     print ("load %d white %d black" % (white_count, black_count))
     do_xgboost(x, y)
+
+    # print ("xgboost and opcode and 4-gram")
+    # max_features=10000
+    # max_document_length=4000
+    # print ("max_features=%d max_document_length=%d" % (max_features,max_document_length))
+    # x, y = get_feature_by_opcode()
+    # print ("load %d white %d black" % (white_count, black_count))
+    # do_xgboost(x, y)
 
     #
     # print ("xgboost and wordbag and 2-gram")
