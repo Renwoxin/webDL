@@ -1,4 +1,3 @@
-import tensorflow as tf
 from keras.layers import Input,Dropout,Dense,Flatten
 from keras.layers import Conv2D,MaxPooling2D
 from keras.models import Model
@@ -8,7 +7,6 @@ from keras.callbacks import TensorBoard
 
 # Data loading and preprocessing
 from keras.datasets import mnist
-import tflearn
 import tflearn.datasets.oxflower17 as oxflower17
 
 
